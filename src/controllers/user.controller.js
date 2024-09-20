@@ -5,13 +5,15 @@ const ApiResponse = require("../utils/ApiResponse");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
-const generateAccessTokenAndRegreshToken = async (userId) => {
+const generateAccessTokenAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
+
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
+
     return { refreshToken, accessToken };
   } catch (error) {
     throw new ApiError(
@@ -76,7 +78,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
   }
 
   const { accessToken, refreshToken } =
-    await generateAccessTokenAndRegreshToken(user._id);
+    await generateAccessTokenAndRefreshToken(user._id);
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
@@ -98,7 +100,31 @@ const loginUser = asyncHandler(async (req, res, next) => {
     );
 });
 
+const currentUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "User Fetched Successfully"));
+});
+
+const getUserById = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  console.log("req params", req.params);
+
+  if (!userId) {
+    throw ApiError(404, "User not found");
+  }
+
+  const user = await User.findById({ _id: userId });
+  console.log("user===>", user);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User Details Fetched Successfully"));
+});
+
 module.exports = {
   registerUser,
   loginUser,
+  currentUser,
+  getUserById,
 };
