@@ -1,80 +1,11 @@
-const mongoose = require("mongoose");
+const express = require("express");
 
-const productSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, "Please Enter product Name"],
-      trim: true,
-    },
-    description: {
-      type: String,
-      required: [true, "Please Enter product Description"],
-    },
-    price: {
-      type: Number,
-      require: [true, "Please Enter product price"],
-      maxLength: [8, "Price cannot execeed characters"],
-    },
-    ratings: {
-      type: Number,
-      default: 0,
-    },
-    images: [
-      {
-        public_id: {
-          type: String,
-          required: true,
-        },
-        url: {
-          type: String,
-          required: true,
-        },
-      },
-    ],
-    category: {
-      type: String,
-      required: [true, "Please Enter Product Price"],
-    },
-    stock: {
-      type: Number,
-      required: [true, "Please Enter Product Stock"],
-      maxLength: [4, "stock canot execeed 4 characters"],
-      default: 1,
-    },
-    numOfReviews: {
-      type: Number,
-      default: 0,
-    },
-    reviews: [
-      {
-        user: {
-          type: mongoose.Schema.ObjectId,
-          ref: "User",
-          required: true,
-        },
-        name: {
-          type: String,
-          required: true,
-        },
-        rating: {
-          type: Number,
-          required: true,
-        },
-        comment: {
-          type: String,
-          required: true,
-        },
-      },
-    ],
-    seller: {
-      type: mongoose.Schema.ObjectId,
-      ref: "User",
-      required: true,
-    },
-  },
+const { createProduct,getProductById } = require("../controllers/product.controller");
+const verifyJwT = require("../middlewares/auth.middleware");
+const router = express.Router();
 
-  { timestamps: true }
-);
+router.route("/seller/product/new").post(verifyJwT,createProduct);
 
-module.exports = mongoose.model("Product", productSchema);
+router.route("/:productId").get(getProductById);
+
+module.exports = router;

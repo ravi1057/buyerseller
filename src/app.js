@@ -18,9 +18,10 @@ app.use(cookieParser());
 //Import Routes
 
 const userRouter = require("./routes/user.routes");
-
+const productRouter = require("./routes/product.routes");
 //routes declaration
 
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/products", productRouter);
 
 module.exports = { app };

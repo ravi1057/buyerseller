@@ -3,7 +3,7 @@ const ApiError = require("../utils/ApiError");
 const User = require("../models/user.model");
 const ApiResponse = require("../utils/ApiResponse");
 const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
+
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
   try {
@@ -66,13 +66,13 @@ const loginUser = asyncHandler(async (req, res, next) => {
   }
 
   const user = await User.findOne({ $or: [{ username, email }] });
-  console.log("user====>", user);
+  
   if (!user) {
     throw new ApiError(401, "User doesnot exists");
   }
 
   const isPasswordValid = await user.isPasswordCorrect(password);
-  console.log(isPasswordValid, "isPasswordValid");
+  
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid Credentials");
   }
@@ -115,7 +115,7 @@ const getUserById = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findById({ _id: userId });
-  console.log("user===>", user);
+
 
   return res
     .status(200)
